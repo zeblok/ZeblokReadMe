@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/name: zbl-ms-xbw1yc2ypv
+  name: zbl-ms-xbw1yc2ypv
+  namespace: cafbaeaimeuatprivate
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zbl-ms-xbw1yc2ypv
+  serviceName: zbl-ms-xbw1yc2ypv-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: zbl-ms-xbw1yc2ypv
+      name: zbl-ms-xbw1yc2ypv
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/edge
+                operator: DoesNotExist
+      containers:
+      - env:
+        - name: GRANT_SUDO
+          value: "yes"
+        - name: CHOWN_HOME
+          value: "yes"
+        - name: ZEBLOK_ACTION
+          value: "true"
+        - name: datalake_url
+          value: http://datalake.intel.zeblok.com:9000
+        - name: datalake_secret
+          value: 10f10c0e814e8799d7d2e28599cb6be7f1ad5163
+        - name: platform_url
+          value: https://app.aime-uat.zeblok.com
+        - name: DEFAULT_BUCKET
+          value: 84c01a66fbae-abhinav
+        - name: S3_BUCKET_NAME
+          value: 84c01a66fbae-abhinav
+        - name: BUCKET_TYPE
+          value: MINIO
+        - name: ACCOUNT_NAME
+        - name: ACCOUNT_KEY
+        - name: CLIENT_ID
+        - name: CLIENT_SECRET
+        - name: TENANT_ID
+        - name: SUBSCRIPTION_ID
+        - name: AWS_SECRET_KEY
+        - name: AWS_ACCESS_KEY_ID
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: Zeblok
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: Zeblok
+        - name: MONGO_INITDB_DATABASE
+          value: Production
+        image: hub.docker.zeblok.com/zeblok/mlflow-microservice:v1771940583.3.9.0
+        imagePullPolicy: Always
+        name: zbl-ms-xbw1yc2ypv
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+            nvidia.com/gpu: "0"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+            nvidia.com/gpu: "0"
+        securityContext:
+          privileged: false
+      dnsPolicy: ClusterFirst
+      hostname: zbl-ms-xbw1yc2ypv
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 100
+        runAsGroup: 100
+        runAsUser: 0
+      serviceAccount: default
+      serviceAccountName: default

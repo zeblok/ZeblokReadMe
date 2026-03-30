@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zbl-aiws-6c3s0xadx
+  namespace: cafbaeaimeuatprivate
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zbl-aiws-6c3s0xadx
+  serviceName: zbl-aiws-6c3s0xadx-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: zbl-aiws-6c3s0xadx
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aimc14
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          start.sh jupyter lab --LabApp.token=57535317cd8562a00e685412333f63791123525d --LabApp.ip='0.0.0.0' --LabApp.allow_root=True
+        env:
+        - name: NB_USER
+          value: abhinav
+        - name: GRANT_SUDO
+          value: "yes"
+        - name: CHOWN_HOME
+          value: "yes"
+        - name: ZEBLOK_ACTION
+          value: "true"
+        - name: GITHUB_URL
+          value: undefined
+        - name: JUPYTER_ALLOW_INSECURE_WRITES
+          value: "true"
+        - name: datalake_url
+          value: https://minio-hl.aime-uat.zeblok.com
+        - name: minio_installation
+          value: OPERATOR
+        - name: datalake_secret
+          value: 10f10c0e814e8799d7d2e28599cb6be7f1ad5163
+        - name: platform_url
+          value: https://app.aime-uat.zeblok.com
+        - name: ATTACH_BUCKET
+          value: "no"
+        - name: S3_BUCKET_NAME
+        - name: DEFAULT_BUCKET
+          value: 84c01a66fbae-abhinav
+        - name: BUCKET_TYPE
+          value: MINIO
+        - name: ACCOUNT_NAME
+        - name: ACCOUNT_KEY
+        - name: CLIENT_ID
+        - name: CLIENT_SECRET
+        - name: TENANT_ID
+        - name: SUBSCRIPTION_ID
+        - name: AWS_SECRET_KEY
+        - name: AWS_ACCESS_KEY_ID
+        image: hub.docker.zeblok.com/zeblok/minimal-notebook:20240208
+        imagePullPolicy: IfNotPresent
+        name: zbl-aiws-6c3s0xadx
+        ports:
+        - containerPort: 8888
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+            nvidia.com/gpu: "0"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+            nvidia.com/gpu: "0"
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /home/abhinav
+          name: zbl-aiws-6c3s0xadx
+        - mountPath: /dev/shm
+          name: dshm
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 100
+        runAsGroup: 100
+        runAsUser: 0
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: dshm
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: zbl-aiws-6c3s0xadx
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: edge-storage-satellite
+      volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zbl-aiws-6c3s0xadx  
+spec:
+  capacity:
+    storage: 5Gi             
+  accessModes:
+  - ReadWriteOnce          
+  persistentVolumeReclaimPolicy: Retain  
+  storageClassName: edge-storage-satellite 
+  hostPath:
+    path: /data/pv-zbl-aiws-6c3s0xadx   
+    type: DirectoryOrCreate             
+  nodeAffinity:                  
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - aimc14
